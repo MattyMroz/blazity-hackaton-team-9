@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
 import type { Issue, Report } from '@/lib/schema'
 import { Button } from '@/components/Button'
+import { SlidingSelect } from '@/components/SlidingSelect'
 
 const KEY_STORAGE = 'brandlint.apiKey'
 
@@ -119,21 +120,20 @@ export default function Page() {
           alt="BrandLint — AI brand compliance"
           className="h-16 w-auto sm:h-24"
         />
-        <div className="relative shrink-0">
-          <select
-            value={model}
-            onChange={(e) => setModel(e.target.value as ModelId)}
-            aria-label="Model Claude"
-            className="cursor-pointer appearance-none rounded-full border border-line bg-surface py-1.5 pl-4 pr-9 font-mono text-[1.05rem] text-muted outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:border-brand"
-          >
-            {MODELS.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label} · {m.note}
-              </option>
-            ))}
-          </select>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[0.9rem] text-faint">▾</span>
-        </div>
+        <SlidingSelect
+          ariaLabel="Model Claude"
+          value={model}
+          onValueChange={(v) => setModel(v as ModelId)}
+          items={MODELS.map((m) => ({
+            value: m.id,
+            label: (
+              <span>
+                <span className="font-semibold text-[var(--text)]">{m.label}</span>{' '}
+                <span className="text-[var(--text-faint)]">· {m.note}</span>
+              </span>
+            ),
+          }))}
+        />
       </div>
 
       {/* hero */}

@@ -21,6 +21,7 @@
   /* needed by the ported Button (text-foreground / bg-background) */
   --color-foreground: #191815;
   --color-background: #f3efe6;
+  --color-muted-foreground: #625e56;
 
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
@@ -54,6 +55,13 @@
   --btn-border: rgba(25, 24, 21, 0.14);
   --btn-hover: rgba(25, 24, 21, 0.09);
   --overlay-hover: rgba(25, 24, 21, 0.09);
+
+  /* accent + glass (used by SlidingSelect dropdown) */
+  --accent-subtle: rgba(232, 112, 88, 0.08);
+  --accent-border: rgba(232, 112, 88, 0.25);
+  --accent-glow: rgba(232, 112, 88, 0.35);
+  --glass-bg: rgba(250, 247, 240, 0.9);
+  --glass-border: rgba(25, 24, 21, 0.12);
 
   --shadow-sm: 0 1px 2px rgb(38 31 29 / 0.06);
   --shadow-md: 0 12px 34px -22px rgb(38 31 29 / 0.34);
