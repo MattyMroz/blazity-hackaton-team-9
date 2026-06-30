@@ -264,16 +264,40 @@ export default function Page() {
 
             <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
               <h2 className="mb-3 text-lg font-semibold">Checklist przed publikacją</h2>
-              <ul className="space-y-2">
-                {report.publish_checklist.map((item, i) => (
+              {(() => {
+                const platformItems = report.publish_checklist.filter((i) => i.platform_check)
+                const brandItems = report.publish_checklist.filter((i) => !i.platform_check)
+                const CheckItem = ({ item, i }: { item: typeof report.publish_checklist[number]; i: number }) => (
                   <li key={i} className="flex items-start gap-2 text-sm">
                     <span className={item.passed ? 'text-emerald-600' : 'text-red-500'}>
                       {item.passed ? '✓' : '✗'}
                     </span>
                     <span className={item.passed ? 'text-stone-600' : 'text-stone-800'}>{item.label}</span>
                   </li>
-                ))}
-              </ul>
+                )
+                return (
+                  <div className="space-y-4">
+                    {platformItems.length > 0 && (
+                      <div>
+                        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-stone-400">Wymagania platformy</p>
+                        <ul className="space-y-2">
+                          {platformItems.map((item, i) => <CheckItem key={i} item={item} i={i} />)}
+                        </ul>
+                      </div>
+                    )}
+                    {brandItems.length > 0 && (
+                      <div>
+                        {platformItems.length > 0 && (
+                          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-stone-400">Zgodność z marką</p>
+                        )}
+                        <ul className="space-y-2">
+                          {brandItems.map((item, i) => <CheckItem key={i} item={item} i={i} />)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           </div>
 

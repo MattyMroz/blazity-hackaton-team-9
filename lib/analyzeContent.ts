@@ -15,7 +15,8 @@ Compare the DRAFT CONTENT against the BRAND GUIDELINES and judge how on-brand it
 You MUST answer only by calling the \`report\` tool — never write prose.
 Be specific and actionable. Quote the offending phrasing inside each issue's detail.
 score: 0-100 (100 = perfectly on-brand). improved_version: the draft rewritten to be fully on-brand.
-publish_checklist: concrete pre-publish checks with a boolean pass/fail.`
+publish_checklist: concrete pre-publish checks with a boolean pass/fail.
+IMPORTANT: Write ALL text fields (summary, issue titles, issue details, suggestions, checklist labels, improved_version) in Polish.`
 
 // Forced tool use is the most reliable way to get structured JSON out of the model.
 const reportTool: Anthropic.Tool = {
@@ -48,6 +49,7 @@ const reportTool: Anthropic.Tool = {
           properties: {
             label: { type: 'string' },
             passed: { type: 'boolean' },
+            platform_check: { type: 'boolean', description: 'true if this is a platform-specific constraint check (character count, format rules, etc.), false or omitted for brand/quality checks' },
           },
           required: ['label', 'passed'],
         },

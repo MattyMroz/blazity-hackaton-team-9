@@ -12,6 +12,7 @@ export const issueSchema = z.object({
 export const checklistItemSchema = z.object({
   label: z.string(),
   passed: z.boolean(),
+  platform_check: z.boolean().optional(),
 })
 
 export const reportSchema = z.object({
