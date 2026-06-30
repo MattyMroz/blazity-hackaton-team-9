@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
-import type { Issue, Report } from '@/lib/schema'
+import type { Report } from '@/lib/schema'
 import { Button } from '@/components/Button'
 import { SlidingSelect } from '@/components/SlidingSelect'
 
@@ -19,16 +19,17 @@ Zasady:
 const SAMPLE_DRAFT = `HEJ!!! Nasz REWELACYJNY nowy panel to absolutny przełom!!!
 Ma TYLE funkcji, że nie uwierzysz. Zapisz się teraz albo przegapisz na zawsze!!!`
 
-const severityLabel: Record<Issue['severity'], string> = {
-  high: 'Wysoki',
-  medium: 'Średni',
-  low: 'Niski',
+// 0-10 impact scale → colour + label (high impact hurts the post most).
+function impactStyle(score: number): string {
+  if (score >= 7) return 'bg-[color-mix(in_srgb,var(--accent)_16%,transparent)] text-brand-dark ring-[color-mix(in_srgb,var(--accent)_32%,transparent)]'
+  if (score >= 4) return 'bg-[color-mix(in_srgb,var(--color-gold)_16%,transparent)] text-[#8a6a23] ring-[color-mix(in_srgb,var(--color-gold)_32%,transparent)]'
+  return 'bg-surface-2 text-faint ring-line'
 }
 
-const severityStyle: Record<Issue['severity'], string> = {
-  high: 'bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark ring-[color-mix(in_srgb,var(--accent)_30%,transparent)]',
-  medium: 'bg-[color-mix(in_srgb,var(--color-gold)_16%,transparent)] text-[#8a6a23] ring-[color-mix(in_srgb,var(--color-gold)_32%,transparent)]',
-  low: 'bg-surface-2 text-faint ring-line',
+function impactLabel(score: number): string {
+  if (score >= 7) return 'duży wpływ'
+  if (score >= 4) return 'średni wpływ'
+  return 'mały wpływ'
 }
 
 function scoreColor(score: number): string {
@@ -240,11 +241,17 @@ export default function Page() {
                 <p className="text-[1.45rem] text-emerald-600">Brak problemów, treść jest zgodna z marką. 🎉</p>
               ) : (
                 <ul className="space-y-3">
-                  {report.issues.map((issue, i) => (
+                  {[...report.issues]
+                    .sort((a, b) => b.impact_score - a.impact_score)
+                    .map((issue, i) => (
                     <li key={i} className="rounded-2xl border border-line bg-surface-2/50 p-4">
                       <div className="flex items-center gap-2.5">
-                        <span className={`rounded-full px-2.5 py-0.5 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${severityStyle[issue.severity]}`}>
-                          {severityLabel[issue.severity]}
+                        <span
+                          title={`Wpływ na post: ${issue.impact_score}/10`}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${impactStyle(issue.impact_score)}`}
+                        >
+                          <span className="tabular-nums">{issue.impact_score}/10</span>
+                          <span className="opacity-70">· {impactLabel(issue.impact_score)}</span>
                         </span>
                         <span className="font-display text-[1.5rem] font-bold">{issue.title}</span>
                       </div>

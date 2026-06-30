@@ -32,16 +32,21 @@ const reportTool: Anthropic.Tool = {
       summary: { type: 'string', description: 'One short paragraph verdict' },
       issues: {
         type: 'array',
-        description: 'Concrete on-brand problems found in the draft',
+        description: 'Array of concrete on-brand problems found in the draft. Return [] if there are no issues.',
         items: {
           type: 'object',
           properties: {
-            severity: { type: 'string', enum: ['low', 'medium', 'high'] },
+            impact_score: {
+              type: 'integer',
+              minimum: 0,
+              maximum: 10,
+              description: '0-10 score for how strongly this specific issue hurts the post',
+            },
             title: { type: 'string', description: 'Short label for the issue' },
             detail: { type: 'string', description: 'What is wrong, quoting the draft' },
             suggestion: { type: 'string', description: 'How to fix it' },
           },
-          required: ['severity', 'title', 'detail', 'suggestion'],
+          required: ['impact_score', 'title', 'detail', 'suggestion'],
         },
       },
       improved_version: { type: 'string', description: 'The draft rewritten fully on-brand' },
