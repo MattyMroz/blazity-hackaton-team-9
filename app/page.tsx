@@ -47,12 +47,18 @@ export default function Page() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [report, setReport] = useState<Report | null>(null)
+  const [edited, setEdited] = useState('')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem(KEY_STORAGE)
     if (saved) setApiKey(saved)
   }, [])
+
+  // Gdy pojawi się nowy raport, wstaw jego wersję on-brand do edytowalnego pola.
+  useEffect(() => {
+    if (report) setEdited(report.improved_version)
+  }, [report])
 
   function onKeyChange(value: string) {
     setApiKey(value)
@@ -94,10 +100,12 @@ export default function Page() {
 
   async function copyImproved() {
     if (!report) return
-    await navigator.clipboard.writeText(report.improved_version)
+    await navigator.clipboard.writeText(edited)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
+
+  const isEdited = report !== null && edited !== report.improved_version
 
   return (
     <main className="mx-auto max-w-5xl px-5 py-10">
@@ -229,17 +237,39 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Wersja on-brand</h2>
-              <button
-                type="button"
-                onClick={copyImproved}
-                className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
-              >
-                {copied ? 'Skopiowano ✓' : 'Kopiuj'}
-              </button>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-semibold">Wersja on-brand</h2>
+                <span className="text-xs text-stone-400">edytowalna</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {isEdited && (
+                  <button
+                    type="button"
+                    onClick={() => setEdited(report.improved_version)}
+                    className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
+                  >
+                    Przywróć
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={copyImproved}
+                  className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
+                >
+                  {copied ? 'Skopiowano ✓' : 'Kopiuj'}
+                </button>
+              </div>
             </div>
-            <p className="whitespace-pre-wrap text-stone-800">{report.improved_version}</p>
+            <textarea
+              value={edited}
+              onChange={(e) => setEdited(e.target.value)}
+              spellCheck={false}
+              className="min-h-40 w-full resize-y whitespace-pre-wrap rounded-lg border border-stone-300 px-3 py-2 text-stone-800 outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            />
+            {isEdited && (
+              <p className="mt-1.5 text-xs text-stone-500">Edytujesz wersję wygenerowaną przez model. „Kopiuj" zapisze Twoją wersję.</p>
+            )}
           </div>
         </section>
       )}
