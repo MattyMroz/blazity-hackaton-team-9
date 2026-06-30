@@ -18,15 +18,15 @@ const SAMPLE_DRAFT = `HEY!!! Our AMAZING new dashboard is a total game-changer!!
 It has SO many features you won't believe it. Sign up now or miss out forever!!!`
 
 const severityStyle: Record<Issue['severity'], string> = {
-  high: 'bg-red-100 text-red-700 ring-red-200',
-  medium: 'bg-amber-100 text-amber-700 ring-amber-200',
-  low: 'bg-stone-100 text-stone-600 ring-stone-200',
+  high: 'bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark ring-[color-mix(in_srgb,var(--accent)_30%,transparent)]',
+  medium: 'bg-[color-mix(in_srgb,var(--color-gold)_16%,transparent)] text-[#8a6a23] ring-[color-mix(in_srgb,var(--color-gold)_32%,transparent)]',
+  low: 'bg-surface-2 text-faint ring-line',
 }
 
 function scoreColor(score: number): string {
   if (score >= 80) return 'text-emerald-600'
-  if (score >= 60) return 'text-amber-600'
-  return 'text-red-600'
+  if (score >= 60) return 'text-gold'
+  return 'text-brand'
 }
 
 function humanError(e: unknown): string {
@@ -100,112 +100,133 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-5 py-10">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+    <main className="mx-auto max-w-5xl px-5 pb-24 pt-10 sm:pt-14">
+      {/* top bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {/* Logo slot — drop your file at public/logo.svg and swap this span for:
+              <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.svg`} alt="BrandLint" className="h-9 w-9" /> */}
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand font-display text-sm font-extrabold text-white shadow-sm">
+            BL
+          </span>
+          <span className="font-display text-lg font-extrabold tracking-tight">
             Brand<span className="text-brand">Lint</span>
-          </h1>
-          <p className="mt-1 text-stone-600">
-            Wklej wytyczne marki i treść — dostań natychmiastowy audyt zgodności.
-          </p>
+          </span>
         </div>
-        <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
+        <span className="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[1.05rem] text-muted">
           {MODEL}
         </span>
+      </div>
+
+      {/* hero */}
+      <header className="mt-14 sm:mt-20">
+        <span className="section-kicker">AI · Brand compliance</span>
+        <h1 className="display display-dot mt-5 text-[clamp(3.2rem,8vw,6.4rem)]">
+          Sprawdź, czy treść jest <em>on&#8209;brand</em>
+        </h1>
+        <p className="mt-5 max-w-xl text-[1.7rem] leading-relaxed text-muted">
+          Wklej wytyczne marki i draft — dostajesz natychmiastowy audyt:
+          ocenę, listę problemów, gotową wersję on-brand i checklistę przed publikacją.
+        </p>
       </header>
 
-      <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <label className="block text-sm font-medium text-stone-700">Klucz Anthropic API</label>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={(e) => onKeyChange(e.target.value)}
-          placeholder="sk-ant-..."
-          autoComplete="off"
-          className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
-        />
-        <p className="mt-1.5 text-xs text-stone-500">
-          Klucz zostaje tylko w Twojej przeglądarce (localStorage) i leci wprost do Anthropic. Nie trafia do repo ani na serwer.
+      {/* form */}
+      <section className="section-card mt-12 rounded-[2rem] p-6 sm:p-8">
+        <label className="eyebrow">Klucz Anthropic API</label>
+        <div className="field mt-2 px-4 py-3">
+          <input
+            type="password"
+            value={apiKey}
+            onChange={(e) => onKeyChange(e.target.value)}
+            placeholder="sk-ant-..."
+            autoComplete="off"
+            className="w-full font-mono text-[1.4rem] text-ink placeholder:text-faint"
+          />
+        </div>
+        <p className="mt-2 text-[1.25rem] text-faint">
+          Klucz zostaje tylko w Twojej przeglądarce (localStorage) i leci wprost do Anthropic — nie do repo ani na serwer.
         </p>
 
-        <div className="mt-5 grid gap-5 md:grid-cols-2">
+        <div className="mt-7 grid gap-6 md:grid-cols-2">
           <div>
-            <div className="mb-1.5 flex items-center justify-between">
-              <label className="text-sm font-medium text-stone-700">Brand guidelines</label>
-              <button
-                type="button"
-                onClick={loadSample}
-                className="text-xs font-medium text-brand hover:text-brand-dark"
-              >
+            <div className="mb-2 flex items-center justify-between">
+              <label className="eyebrow">Brand guidelines</label>
+              <button type="button" onClick={loadSample} className="font-mono text-[1.1rem] font-semibold uppercase tracking-wider text-brand hover:text-brand-dark">
                 Wstaw przykład
               </button>
             </div>
-            <textarea
-              value={guidelines}
-              onChange={(e) => setGuidelines(e.target.value)}
-              placeholder="Ton głosu, zasady, czego unikać..."
-              className="min-h-40 w-full resize-y rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            />
+            <div className="field px-4 py-3">
+              <textarea
+                value={guidelines}
+                onChange={(e) => setGuidelines(e.target.value)}
+                placeholder="Ton głosu, zasady, czego unikać..."
+                className="min-h-40 w-full resize-y text-[1.4rem] leading-relaxed text-ink placeholder:text-faint"
+              />
+            </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">Treść do sprawdzenia</label>
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Wklej post / e-mail / opis produktu..."
-              className="min-h-40 w-full resize-y rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            />
+            <label className="eyebrow mb-2 block">Treść do sprawdzenia</label>
+            <div className="field px-4 py-3">
+              <textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Wklej post / e-mail / opis produktu..."
+                className="min-h-40 w-full resize-y text-[1.4rem] leading-relaxed text-ink placeholder:text-faint"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-3">
+        <div className="mt-7 flex flex-wrap items-center gap-4">
           <button
             type="button"
             onClick={onAnalyze}
             disabled={loading}
-            className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-accent rounded-xl px-7 py-3 text-[1.5rem] font-semibold"
           >
-            {loading ? 'Analizuję…' : 'Analizuj'}
+            {loading ? 'Analizuję…' : 'Analizuj treść'}
           </button>
-          {error && <span className="text-sm font-medium text-red-600">{error}</span>}
+          {error && <span className="text-[1.35rem] font-medium text-brand-dark">{error}</span>}
         </div>
       </section>
 
       {report && (
-        <section className="mt-8 space-y-6">
-          <div className="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
-            <div className="flex shrink-0 flex-col items-center">
-              <span className={`text-5xl font-bold tabular-nums ${scoreColor(report.score)}`}>
+        <section className="mt-10 space-y-6">
+          {/* score */}
+          <div className="section-card animate-slide-up flex flex-col gap-6 rounded-[2rem] p-7 sm:flex-row sm:items-center sm:p-9">
+            <div className="flex shrink-0 items-baseline gap-2">
+              <span className={`font-display text-[6.4rem] font-extrabold leading-none tabular-nums ${scoreColor(report.score)}`}>
                 {report.score}
               </span>
-              <span className="text-xs uppercase tracking-wide text-stone-500">/ 100</span>
+              <span className="font-mono text-[1.2rem] uppercase tracking-widest text-faint">/ 100</span>
             </div>
-            <p className="text-stone-700">{report.summary}</p>
+            <div className="hairline h-px w-full sm:h-16 sm:w-px sm:self-stretch" />
+            <p className="text-[1.6rem] leading-relaxed text-ink">{report.summary}</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-lg font-semibold">
-                Problemy <span className="text-stone-400">({report.issues.length})</span>
-              </h2>
+            {/* issues */}
+            <div className="section-card animate-slide-up stagger-1 rounded-[2rem] p-7">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="eyebrow">Problemy</span>
+                <span className="ring-no h-7 w-7 text-[1.1rem]">{report.issues.length}</span>
+              </div>
               {report.issues.length === 0 ? (
-                <p className="text-sm text-emerald-600">Brak problemów — treść jest on-brand. 🎉</p>
+                <p className="text-[1.45rem] text-emerald-600">Brak problemów — treść jest on-brand. 🎉</p>
               ) : (
                 <ul className="space-y-3">
                   {report.issues.map((issue, i) => (
-                    <li key={i} className="rounded-lg border border-stone-100 bg-stone-50 p-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ring-1 ${severityStyle[issue.severity]}`}
-                        >
+                    <li key={i} className="rounded-2xl border border-line bg-surface-2/50 p-4">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`rounded-full px-2.5 py-0.5 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${severityStyle[issue.severity]}`}>
                           {issue.severity}
                         </span>
-                        <span className="font-medium">{issue.title}</span>
+                        <span className="font-display text-[1.5rem] font-bold">{issue.title}</span>
                       </div>
-                      <p className="mt-1.5 text-sm text-stone-600">{issue.detail}</p>
-                      <p className="mt-1 text-sm text-stone-800">
-                        <span className="font-medium text-emerald-700">Fix:</span> {issue.suggestion}
+                      <p className="mt-2 text-[1.4rem] leading-relaxed text-muted">{issue.detail}</p>
+                      <p className="mt-1.5 text-[1.4rem] leading-relaxed text-ink">
+                        <span className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-emerald-700">Fix</span>{' '}
+                        {issue.suggestion}
                       </p>
                     </li>
                   ))}
@@ -213,39 +234,37 @@ export default function Page() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-              <h2 className="mb-3 text-lg font-semibold">Checklist przed publikacją</h2>
-              <ul className="space-y-2">
+            {/* checklist */}
+            <div className="section-card animate-slide-up stagger-2 rounded-[2rem] p-7">
+              <span className="eyebrow">Checklist przed publikacją</span>
+              <ul className="mt-4 space-y-2.5">
                 {report.publish_checklist.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <span className={item.passed ? 'text-emerald-600' : 'text-red-500'}>
+                  <li key={i} className="flex items-start gap-3 text-[1.45rem]">
+                    <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[1.2rem] font-bold ${item.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark'}`}>
                       {item.passed ? '✓' : '✗'}
                     </span>
-                    <span className={item.passed ? 'text-stone-600' : 'text-stone-800'}>{item.label}</span>
+                    <span className={item.passed ? 'text-muted' : 'text-ink'}>{item.label}</span>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Wersja on-brand</h2>
-              <button
-                type="button"
-                onClick={copyImproved}
-                className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
-              >
+          {/* improved version */}
+          <div className="paper-frame animate-slide-up stagger-3 p-7 sm:p-9">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="section-kicker">Wersja on-brand</span>
+              <button type="button" onClick={copyImproved} className="btn-surface rounded-xl px-4 py-2 text-[1.3rem] font-semibold">
                 {copied ? 'Skopiowano ✓' : 'Kopiuj'}
               </button>
             </div>
-            <p className="whitespace-pre-wrap text-stone-800">{report.improved_version}</p>
+            <p className="whitespace-pre-wrap text-[1.6rem] leading-relaxed text-ink">{report.improved_version}</p>
           </div>
         </section>
       )}
 
-      <footer className="mt-12 text-center text-xs text-stone-400">
-        BrandLint · Next.js + Tailwind + Anthropic SDK + Zod · static (GitHub Pages)
+      <footer className="mt-20 border-t border-line pt-6 text-center font-mono text-[1.1rem] uppercase tracking-widest text-faint">
+        BrandLint · Next.js · Tailwind · Anthropic SDK · Zod
       </footer>
     </main>
   )
