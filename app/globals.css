@@ -293,3 +293,8 @@ body::-webkit-scrollbar-thumb:hover { background-color: var(--text); }
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
+/* the wrapper shows focus — kill the input's own square outline */
+.field :is(input, textarea):focus,
+.field :is(input, textarea):focus-visible {
+  outline: none;
+}
