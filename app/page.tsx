@@ -3,19 +3,26 @@
 import { useEffect, useState } from 'react'
 import { analyzeContent, MODEL } from '@/lib/analyzeContent'
 import type { Issue, Report } from '@/lib/schema'
+import { Button } from '@/components/Button'
 
 const KEY_STORAGE = 'brandlint.apiKey'
 
-const SAMPLE_GUIDELINES = `Brand: Northwind.
-Voice: confident, warm, plain-spoken. We sound like a knowledgeable friend, never a salesperson.
-Rules:
-- No ALL CAPS, no more than one exclamation mark per message.
-- No hype words ("amazing", "revolutionary", "game-changer").
-- Always lead with the customer benefit, not the feature.
-- British English spelling. Inclusive, jargon-free language.`
+const SAMPLE_GUIDELINES = `Marka: Northwind.
+Ton głosu: pewny, ciepły, prosty. Brzmimy jak dobrze poinformowany znajomy, nigdy jak sprzedawca.
+Zasady:
+- Bez WERSALIKÓW, maksymalnie jeden wykrzyknik na wiadomość.
+- Bez słów-wydmuszek („rewelacyjny”, „rewolucyjny”, „przełomowy”).
+- Zawsze zaczynaj od korzyści dla klienta, nie od funkcji.
+- Język włączający, bez żargonu.`
 
-const SAMPLE_DRAFT = `HEY!!! Our AMAZING new dashboard is a total game-changer!!!
-It has SO many features you won't believe it. Sign up now or miss out forever!!!`
+const SAMPLE_DRAFT = `HEJ!!! Nasz REWELACYJNY nowy panel to absolutny przełom!!!
+Ma TYLE funkcji, że nie uwierzysz. Zapisz się teraz albo przegapisz na zawsze!!!`
+
+const severityLabel: Record<Issue['severity'], string> = {
+  high: 'Wysoki',
+  medium: 'Średni',
+  low: 'Niski',
+}
 
 const severityStyle: Record<Issue['severity'], string> = {
   high: 'bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark ring-[color-mix(in_srgb,var(--accent)_30%,transparent)]',
@@ -33,7 +40,7 @@ function humanError(e: unknown): string {
   if (e && typeof e === 'object' && 'status' in e) {
     const status = (e as { status?: number }).status
     if (status === 401) return 'Nieprawidłowy klucz API (401). Sprawdź sk-ant-...'
-    if (status === 429) return 'Limit zapytań (429) — odczekaj chwilę i spróbuj ponownie.'
+    if (status === 429) return 'Limit zapytań (429). Odczekaj chwilę i spróbuj ponownie.'
     if (status === 400) return 'Błędne żądanie (400). Spróbuj skrócić treść.'
   }
   if (e instanceof Error) return e.message
@@ -65,6 +72,7 @@ export default function Page() {
   }
 
   async function onAnalyze() {
+    if (loading) return
     setError(null)
     setReport(null)
     if (!apiKey.trim()) {
@@ -81,7 +89,7 @@ export default function Page() {
         apiKey: apiKey.trim(),
         guidelines:
           guidelines.trim() ||
-          'No explicit brand guidelines provided — apply general best practices for clear, professional, on-brand content.',
+          'Brak jawnych wytycznych marki. Zastosuj ogólne dobre praktyki dla jasnej, profesjonalnej treści.',
         draft: draft.trim(),
       })
       setReport(result)
@@ -101,10 +109,10 @@ export default function Page() {
 
   return (
     <main className="mx-auto max-w-5xl px-5 pb-24 pt-10 sm:pt-14">
-      {/* top bar */}
+      {/* pasek górny */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* Logo slot — drop your file at public/logo.svg and swap this span for:
+          {/* Logo: wrzuć plik do public/logo.svg i podmień ten kwadrat na
               <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.svg`} alt="BrandLint" className="h-9 w-9" /> */}
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand font-display text-sm font-extrabold text-white shadow-sm">
             BL
@@ -120,17 +128,16 @@ export default function Page() {
 
       {/* hero */}
       <header className="mt-14 sm:mt-20">
-        <span className="section-kicker">AI · Brand compliance</span>
+        <span className="section-kicker">AI · Zgodność z marką</span>
         <h1 className="display display-dot mt-5 text-[clamp(3.2rem,8vw,6.4rem)]">
-          Sprawdź, czy treść jest <em>on&#8209;brand</em>
+          Sprawdź, czy treść jest <em className="text-brand">on&#8209;brand</em>
         </h1>
-        <p className="mt-5 max-w-xl text-[1.7rem] leading-relaxed text-muted">
-          Wklej wytyczne marki i draft — dostajesz natychmiastowy audyt:
-          ocenę, listę problemów, gotową wersję on-brand i checklistę przed publikacją.
+        <p className="mt-5 max-w-md text-[1.7rem] leading-relaxed text-muted">
+          Wytyczne marki plus szkic. W kilka sekund dostajesz ocenę, problemy i gotową poprawkę.
         </p>
       </header>
 
-      {/* form */}
+      {/* formularz */}
       <section className="section-card mt-12 rounded-[2rem] p-6 sm:p-8">
         <label className="eyebrow">Klucz Anthropic API</label>
         <div className="field mt-2 px-4 py-3">
@@ -144,16 +151,22 @@ export default function Page() {
           />
         </div>
         <p className="mt-2 text-[1.25rem] text-faint">
-          Klucz zostaje tylko w Twojej przeglądarce (localStorage) i leci wprost do Anthropic — nie do repo ani na serwer.
+          Klucz zostaje tylko w Twojej przeglądarce i leci wprost do Anthropic. Nie trafia do repo ani na serwer.
         </p>
 
         <div className="mt-7 grid gap-6 md:grid-cols-2">
           <div>
-            <div className="mb-2 flex items-center justify-between">
-              <label className="eyebrow">Brand guidelines</label>
-              <button type="button" onClick={loadSample} className="font-mono text-[1.1rem] font-semibold uppercase tracking-wider text-brand hover:text-brand-dark">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="eyebrow">Wytyczne marki</label>
+              <Button
+                type="button"
+                onClick={loadSample}
+                variant="link"
+                size="xs"
+                className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-brand"
+              >
                 Wstaw przykład
-              </button>
+              </Button>
             </div>
             <div className="field px-4 py-3">
               <textarea
@@ -170,29 +183,31 @@ export default function Page() {
               <textarea
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="Wklej post / e-mail / opis produktu..."
+                placeholder="Wklej post, e-mail lub opis produktu..."
                 className="min-h-40 w-full resize-y text-[1.4rem] leading-relaxed text-ink placeholder:text-faint"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-7 flex flex-wrap items-center gap-4">
-          <button
+        <div className="mt-7 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
+          <Button
             type="button"
             onClick={onAnalyze}
             disabled={loading}
-            className="btn-accent rounded-xl px-7 py-3 text-[1.5rem] font-semibold"
+            variant="accent"
+            size="pill"
+            className="w-full font-semibold sm:w-auto"
           >
             {loading ? 'Analizuję…' : 'Analizuj treść'}
-          </button>
+          </Button>
           {error && <span className="text-[1.35rem] font-medium text-brand-dark">{error}</span>}
         </div>
       </section>
 
       {report && (
         <section className="mt-10 space-y-6">
-          {/* score */}
+          {/* ocena */}
           <div className="section-card animate-slide-up flex flex-col gap-6 rounded-[2rem] p-7 sm:flex-row sm:items-center sm:p-9">
             <div className="flex shrink-0 items-baseline gap-2">
               <span className={`font-display text-[6.4rem] font-extrabold leading-none tabular-nums ${scoreColor(report.score)}`}>
@@ -205,27 +220,27 @@ export default function Page() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {/* issues */}
+            {/* problemy */}
             <div className="section-card animate-slide-up stagger-1 rounded-[2rem] p-7">
               <div className="mb-4 flex items-center gap-3">
                 <span className="eyebrow">Problemy</span>
                 <span className="ring-no h-7 w-7 text-[1.1rem]">{report.issues.length}</span>
               </div>
               {report.issues.length === 0 ? (
-                <p className="text-[1.45rem] text-emerald-600">Brak problemów — treść jest on-brand. 🎉</p>
+                <p className="text-[1.45rem] text-emerald-600">Brak problemów, treść jest zgodna z marką. 🎉</p>
               ) : (
                 <ul className="space-y-3">
                   {report.issues.map((issue, i) => (
                     <li key={i} className="rounded-2xl border border-line bg-surface-2/50 p-4">
                       <div className="flex items-center gap-2.5">
                         <span className={`rounded-full px-2.5 py-0.5 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${severityStyle[issue.severity]}`}>
-                          {issue.severity}
+                          {severityLabel[issue.severity]}
                         </span>
                         <span className="font-display text-[1.5rem] font-bold">{issue.title}</span>
                       </div>
                       <p className="mt-2 text-[1.4rem] leading-relaxed text-muted">{issue.detail}</p>
                       <p className="mt-1.5 text-[1.4rem] leading-relaxed text-ink">
-                        <span className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-emerald-700">Fix</span>{' '}
+                        <span className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-emerald-700">Poprawka</span>{' '}
                         {issue.suggestion}
                       </p>
                     </li>
@@ -234,9 +249,9 @@ export default function Page() {
               )}
             </div>
 
-            {/* checklist */}
+            {/* lista kontrolna */}
             <div className="section-card animate-slide-up stagger-2 rounded-[2rem] p-7">
-              <span className="eyebrow">Checklist przed publikacją</span>
+              <span className="eyebrow">Lista kontrolna przed publikacją</span>
               <ul className="mt-4 space-y-2.5">
                 {report.publish_checklist.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-[1.45rem]">
@@ -250,13 +265,13 @@ export default function Page() {
             </div>
           </div>
 
-          {/* improved version */}
+          {/* wersja zgodna z marką */}
           <div className="paper-frame animate-slide-up stagger-3 p-7 sm:p-9">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="section-kicker">Wersja on-brand</span>
-              <button type="button" onClick={copyImproved} className="btn-surface rounded-xl px-4 py-2 text-[1.3rem] font-semibold">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <span className="section-kicker">Wersja zgodna z marką</span>
+              <Button type="button" onClick={copyImproved} variant="secondary" size="sm" className="text-[1.3rem] font-semibold">
                 {copied ? 'Skopiowano ✓' : 'Kopiuj'}
-              </button>
+              </Button>
             </div>
             <p className="whitespace-pre-wrap text-[1.6rem] leading-relaxed text-ink">{report.improved_version}</p>
           </div>

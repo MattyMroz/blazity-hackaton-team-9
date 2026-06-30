@@ -18,6 +18,10 @@
   --color-surface-2: #e8e2d8;
   --color-line: rgba(25, 24, 21, 0.14);
 
+  /* needed by the ported Button (text-foreground / bg-background) */
+  --color-foreground: #191815;
+  --color-background: #f3efe6;
+
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -40,9 +44,26 @@
   --line: rgba(25, 24, 21, 0.14);
   --line-strong: rgba(25, 24, 21, 0.32);
 
+  --background: #f3efe6;
+  --foreground: #191815;
+  --destructive: #c0492f;
+  --ring: #e87058;
+
+  /* button surfaces (ported from MangaShift theme-light) */
+  --btn-bg: rgba(25, 24, 21, 0.05);
+  --btn-border: rgba(25, 24, 21, 0.14);
+  --btn-hover: rgba(25, 24, 21, 0.09);
+  --overlay-hover: rgba(25, 24, 21, 0.09);
+
   --shadow-sm: 0 1px 2px rgb(38 31 29 / 0.06);
   --shadow-md: 0 12px 34px -22px rgb(38 31 29 / 0.34);
   --shadow-lg: 0 28px 70px -34px rgb(38 31 29 / 0.4);
+
+  /* type scale used by Button sizes */
+  --h3-font-size: 1.872rem;
+  --normal-font-size: 1.6rem;
+  --small-font-size: 1.328rem;
+  --tiny-font-size: 1.072rem;
 
   --radius: 0.8rem;
 }
@@ -67,6 +88,16 @@ body {
   min-height: 100%;
   position: relative;
   overflow-x: hidden;
+  /* klik w labelki/przyciski nie zaznacza tekstu (jak w MangaShift) */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* pola formularza pozostają zaznaczalne */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* paper grain — subtle fractal-noise overlay */
@@ -196,6 +227,9 @@ body::-webkit-scrollbar-thumb:hover { background-color: var(--text); }
   border-color: var(--line-strong);
   box-shadow: var(--shadow-md);
 }
+
+.btn-press { will-change: transform; }
+.btn-press:active { transform: scale(0.92); opacity: 0.82; }
 
 .hairline { border: 0; height: 1px; width: 100%; background: var(--line); }
 
