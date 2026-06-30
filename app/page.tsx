@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { analyzeContent, MODEL } from '@/lib/analyzeContent'
+import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
 import type { Issue, Report } from '@/lib/schema'
 import { Button } from '@/components/Button'
 
@@ -49,6 +49,7 @@ function humanError(e: unknown): string {
 
 export default function Page() {
   const [apiKey, setApiKey] = useState('')
+  const [model, setModel] = useState<ModelId>(DEFAULT_MODEL)
   const [guidelines, setGuidelines] = useState('')
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
@@ -87,6 +88,7 @@ export default function Page() {
     try {
       const result = await analyzeContent({
         apiKey: apiKey.trim(),
+        model,
         guidelines:
           guidelines.trim() ||
           'Brak jawnych wytycznych marki. Zastosuj ogólne dobre praktyki dla jasnej, profesjonalnej treści.',
@@ -115,11 +117,23 @@ export default function Page() {
         <img
           src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.png`}
           alt="BrandLint — AI brand compliance"
-          className="h-10 w-auto sm:h-12"
+          className="h-16 w-auto sm:h-24"
         />
-        <span className="shrink-0 rounded-full border border-line bg-surface px-3 py-1 font-mono text-[1.05rem] text-muted">
-          {MODEL}
-        </span>
+        <div className="relative shrink-0">
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value as ModelId)}
+            aria-label="Model Claude"
+            className="cursor-pointer appearance-none rounded-full border border-line bg-surface py-1.5 pl-4 pr-9 font-mono text-[1.05rem] text-muted outline-none transition-colors hover:border-[var(--line-strong)] focus-visible:border-brand"
+          >
+            {MODELS.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.label} · {m.note}
+              </option>
+            ))}
+          </select>
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[0.9rem] text-faint">▾</span>
+        </div>
       </div>
 
       {/* hero */}
@@ -128,7 +142,7 @@ export default function Page() {
         <h1 className="display display-dot mt-5 text-[clamp(3.2rem,8vw,6.4rem)]">
           Sprawdź, czy treść jest <em className="text-brand">on&#8209;brand</em>
         </h1>
-        <p className="mt-5 max-w-md text-[1.7rem] leading-relaxed text-muted">
+        <p className="mt-5 max-w-[46rem] text-pretty text-[1.7rem] leading-relaxed text-muted">
           Wytyczne marki plus szkic. W kilka sekund dostajesz ocenę, problemy i gotową poprawkę.
         </p>
       </header>

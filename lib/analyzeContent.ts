@@ -1,9 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { reportSchema, type Report } from './schema'
 
-// Demo wants maximum "wow" → Opus (top quality).
-// Swap to 'claude-sonnet-4-6' for a cheaper/faster sweet spot.
-export const MODEL = 'claude-opus-4-8'
+// User-selectable models (ported from the brandlit-2 branch).
+export const MODELS = [
+  { id: 'claude-opus-4-8', label: 'Opus 4.8', note: 'najwyższa jakość' },
+  { id: 'claude-sonnet-4-6', label: 'Sonnet 4.6', note: 'szybszy, tańszy' },
+  { id: 'claude-haiku-4-5', label: 'Haiku 4.5', note: 'najszybszy' },
+] as const
+
+export type ModelId = (typeof MODELS)[number]['id']
+export const DEFAULT_MODEL: ModelId = 'claude-opus-4-8'
 
 const SYSTEM = `You are BrandLint, a senior brand-compliance reviewer.
 Compare the DRAFT CONTENT against the BRAND GUIDELINES and judge how on-brand it is.
@@ -59,12 +65,13 @@ export async function analyzeContent(opts: {
   apiKey: string
   guidelines: string
   draft: string
+  model: ModelId
 }): Promise<Report> {
   // The key never leaves the browser except in the request straight to Anthropic.
   const client = new Anthropic({ apiKey: opts.apiKey, dangerouslyAllowBrowser: true })
 
   const res = await client.messages.create({
-    model: MODEL,
+    model: opts.model,
     max_tokens: 4000,
     system: SYSTEM,
     tools: [reportTool],
