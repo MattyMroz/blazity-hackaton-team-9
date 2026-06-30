@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
 import { CONTENT_CATEGORIES, type CategoryId } from '@/lib/categories'
-import type { Issue, Report } from '@/lib/schema'
+import type { Report } from '@/lib/schema'
 
 const KEY_STORAGE = 'brandlint.apiKey'
 
@@ -18,16 +18,16 @@ Rules:
 const SAMPLE_DRAFT = `HEY!!! Our AMAZING new dashboard is a total game-changer!!!
 It has SO many features you won't believe it. Sign up now or miss out forever!!!`
 
-const severityStyle: Record<Issue['severity'], string> = {
-  high: 'bg-red-100 text-red-700 ring-red-200',
-  medium: 'bg-amber-100 text-amber-700 ring-amber-200',
-  low: 'bg-stone-100 text-stone-600 ring-stone-200',
-}
-
 function scoreColor(score: number): string {
   if (score >= 80) return 'text-emerald-600'
   if (score >= 60) return 'text-amber-600'
   return 'text-red-600'
+}
+
+function impactStyle(score: number): string {
+  if (score >= 8) return 'bg-red-100 text-red-700 ring-red-200'
+  if (score >= 5) return 'bg-amber-100 text-amber-700 ring-amber-200'
+  return 'bg-stone-100 text-stone-600 ring-stone-200'
 }
 
 function humanError(e: unknown): string {
@@ -244,13 +244,16 @@ export default function Page() {
                 <ul className="space-y-3">
                   {report.issues.map((issue, i) => (
                     <li key={i} className="rounded-lg border border-stone-100 bg-stone-50 p-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-start gap-3">
                         <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ring-1 ${severityStyle[issue.severity]}`}
+                          className={`shrink-0 rounded-lg px-2 py-1 text-xs font-semibold ring-1 ${impactStyle(issue.impact_score)}`}
                         >
-                          {issue.severity}
+                          {issue.impact_score}/10
                         </span>
-                        <span className="font-medium">{issue.title}</span>
+                        <div>
+                          <span className="font-medium">{issue.title}</span>
+                          <p className="text-xs text-stone-500">Wpływ na post</p>
+                        </div>
                       </div>
                       <p className="mt-1.5 text-sm text-stone-600">{issue.detail}</p>
                       <p className="mt-1 text-sm text-stone-800">
