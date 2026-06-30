@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { analyzeContent, MODEL } from '@/lib/analyzeContent'
+import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
 import type { Issue, Report } from '@/lib/schema'
 
 const KEY_STORAGE = 'brandlint.apiKey'
@@ -42,6 +42,7 @@ function humanError(e: unknown): string {
 
 export default function Page() {
   const [apiKey, setApiKey] = useState('')
+  const [model, setModel] = useState<ModelId>(DEFAULT_MODEL)
   const [guidelines, setGuidelines] = useState('')
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
@@ -85,6 +86,7 @@ export default function Page() {
     try {
       const result = await analyzeContent({
         apiKey: apiKey.trim(),
+        model,
         guidelines:
           guidelines.trim() ||
           'No explicit brand guidelines provided — apply general best practices for clear, professional, on-brand content.',
@@ -118,9 +120,20 @@ export default function Page() {
             Wklej wytyczne marki i treść — dostań natychmiastowy audyt zgodności.
           </p>
         </div>
-        <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
-          {MODEL}
-        </span>
+        <div className="relative">
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value as ModelId)}
+            className="appearance-none rounded-full bg-stone-900 py-1 pl-3 pr-7 text-xs font-medium text-white outline-none cursor-pointer hover:bg-stone-700 transition-colors"
+          >
+            {MODELS.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.label} — {m.note}
+              </option>
+            ))}
+          </select>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 text-[10px]">▾</span>
+        </div>
       </header>
 
       <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
