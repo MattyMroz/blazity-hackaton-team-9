@@ -122,13 +122,13 @@ function SlidingSelectViewport({ items }: ViewportProps) {
     <SelectPrimitive.Viewport ref={viewportRef} className="relative w-full p-1.5">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-0 top-0 z-0 rounded-lg"
+        className="pointer-events-none absolute left-0 top-0 z-0 rounded-full border border-[var(--accent-border)]"
         style={{
           transform: `translate(${pill.x}px, ${pill.y}px)`,
           width: pill.w,
           height: pill.h,
           opacity: pill.visible ? 1 : 0,
-          background: 'var(--accent-subtle)',
+          background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
           transition: pill.animated
             ? 'transform 180ms cubic-bezier(0.4, 0, 0.2, 1), width 180ms cubic-bezier(0.4, 0, 0.2, 1), height 180ms cubic-bezier(0.4, 0, 0.2, 1), opacity 120ms ease-out'
             : 'opacity 120ms ease-out',
@@ -140,8 +140,8 @@ function SlidingSelectViewport({ items }: ViewportProps) {
           value={item.value}
           disabled={item.disabled}
           className={cn(
-            'relative z-[1] flex w-full cursor-pointer select-none items-center gap-2 rounded-lg py-2 pl-3 pr-9 font-mono text-[1.35rem] outline-none',
-            'focus:bg-transparent data-[highlighted]:bg-transparent',
+            'relative z-[1] flex w-full cursor-pointer select-none items-center gap-2 rounded-full py-2 pl-3.5 pr-9 font-mono text-[1.35rem] outline-none',
+            'focus:bg-transparent focus:outline-none focus-visible:outline-none data-[highlighted]:bg-transparent',
             'data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
           )}
         >

@@ -306,3 +306,9 @@ body::-webkit-scrollbar-thumb:hover { background-color: var(--text); }
 .field :is(input, textarea):focus-visible {
   outline: none;
 }
+
+/* dropdown options: no square focus outline — the rounded sliding pill is the highlight */
+[data-radix-select-viewport] [role="option"]:focus,
+[data-radix-select-viewport] [role="option"]:focus-visible {
+  outline: none;
+}
