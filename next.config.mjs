@@ -10,6 +10,8 @@ const nextConfig = {
   images: { unoptimized: true }, // no image optimization server on Pages
   basePath: isProd ? `/${repo}` : '',
   assetPrefix: isProd ? `/${repo}/` : '',
+  // exposed to the browser so plain <img src> can prefix the basePath on Pages
+  env: { NEXT_PUBLIC_BASE_PATH: isProd ? `/${repo}` : '' },
 }
 
 export default nextConfig

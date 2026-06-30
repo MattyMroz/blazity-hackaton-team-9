@@ -108,20 +108,16 @@ export default function Page() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-5 pb-24 pt-10 sm:pt-14">
+    <main className="mx-auto w-full max-w-[88rem] px-4 pb-24 pt-8 sm:px-6 sm:pt-14">
       {/* pasek górny */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {/* Logo: wrzuć plik do public/logo.svg i podmień ten kwadrat na
-              <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.svg`} alt="BrandLint" className="h-9 w-9" /> */}
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand font-display text-sm font-extrabold text-white shadow-sm">
-            BL
-          </span>
-          <span className="font-display text-lg font-extrabold tracking-tight">
-            Brand<span className="text-brand">Lint</span>
-          </span>
-        </div>
-        <span className="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[1.05rem] text-muted">
+      <div className="flex items-center justify-between gap-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.png`}
+          alt="BrandLint — AI brand compliance"
+          className="h-10 w-auto sm:h-12"
+        />
+        <span className="shrink-0 rounded-full border border-line bg-surface px-3 py-1 font-mono text-[1.05rem] text-muted">
           {MODEL}
         </span>
       </div>

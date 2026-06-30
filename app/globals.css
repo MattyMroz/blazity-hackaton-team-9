@@ -71,14 +71,22 @@
 /* ── base ─────────────────────────────────────────────────── */
 
 html {
+  /* MangaShift rem base: 1rem = 10px, so every rem value scales as intended */
+  font-size: 62.5%;
   scroll-behavior: smooth;
   background-color: var(--bg);
   color-scheme: light;
   -webkit-font-smoothing: antialiased;
 }
 
+/* phones: shrink the whole rem scale a touch so nothing overflows */
+@media (max-width: 768px) {
+  html { font-size: 56.25%; }
+}
+
 body {
   font-family: var(--font-body), system-ui, -apple-system, sans-serif;
+  font-size: 1.6rem;
   line-height: 1.6;
   color: var(--text);
   background:
