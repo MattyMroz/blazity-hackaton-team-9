@@ -37,6 +37,8 @@ export const issueSchema = z.object({
 export const checklistItemSchema = z.object({
   label: z.string(),
   passed: z.boolean(),
+  // true = platform-specific constraint (char count, format), not a brand/voice check (brandlit-2).
+  platform_check: z.boolean().optional(),
 })
 
 export const reportSchema = z.object({

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
+import { CONTENT_CATEGORIES, type CategoryId } from '@/lib/categories'
 import type { Report } from '@/lib/schema'
 import { Button } from '@/components/Button'
 import { SlidingSelect } from '@/components/SlidingSelect'
+import { ThinkingLoader } from '@/components/ThinkingLoader'
 
 const KEY_STORAGE = 'brandlint.apiKey'
 
@@ -32,6 +34,12 @@ function impactLabel(score: number): string {
   return 'mały wpływ'
 }
 
+function chipCls(active: boolean): string {
+  return active
+    ? 'border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark'
+    : 'border-line bg-surface text-muted hover:border-[var(--line-strong)] hover:text-ink'
+}
+
 function scoreColor(score: number): string {
   if (score >= 80) return 'text-emerald-600'
   if (score >= 60) return 'text-gold'
@@ -52,6 +60,7 @@ function humanError(e: unknown): string {
 export default function Page() {
   const [apiKey, setApiKey] = useState('')
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL)
+  const [category, setCategory] = useState<CategoryId | null>(null)
   const [guidelines, setGuidelines] = useState('')
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
@@ -91,6 +100,7 @@ export default function Page() {
       const result = await analyzeContent({
         apiKey: apiKey.trim(),
         model,
+        categoryContext: CONTENT_CATEGORIES.find((c) => c.id === category)?.context,
         guidelines:
           guidelines.trim() ||
           'Brak jawnych wytycznych marki. Zastosuj ogólne dobre praktyki dla jasnej, profesjonalnej treści.',
@@ -114,26 +124,12 @@ export default function Page() {
   return (
     <main className="mx-auto w-full max-w-[88rem] px-4 pb-24 pt-8 sm:px-6 sm:pt-14">
       {/* pasek górny */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/logo.png`}
           alt="BrandLint — AI brand compliance"
           className="h-16 w-auto sm:h-24"
-        />
-        <SlidingSelect
-          ariaLabel="Model Claude"
-          value={model}
-          onValueChange={(v) => setModel(v as ModelId)}
-          items={MODELS.map((m) => ({
-            value: m.id,
-            label: (
-              <span>
-                <span className="font-semibold text-[var(--text)]">{m.label}</span>{' '}
-                <span className="text-[var(--text-faint)]">· {m.note}</span>
-              </span>
-            ),
-          }))}
         />
       </div>
 
@@ -150,7 +146,27 @@ export default function Page() {
 
       {/* formularz */}
       <section className="section-card mt-12 rounded-[2rem] p-6 sm:p-8">
-        <label className="eyebrow">Klucz Anthropic API</label>
+        {/* ustawienia: klucz API + model */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label className="eyebrow">Klucz Anthropic API</label>
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-faint">Model</span>
+            <SlidingSelect
+              ariaLabel="Model Claude"
+              value={model}
+              onValueChange={(v) => setModel(v as ModelId)}
+              items={MODELS.map((m) => ({
+                value: m.id,
+                label: (
+                  <span>
+                    <span className="font-semibold text-[var(--text)]">{m.label}</span>{' '}
+                    <span className="text-[var(--text-faint)]">· {m.note}</span>
+                  </span>
+                ),
+              }))}
+            />
+          </div>
+        </div>
         <div className="field mt-2 px-4 py-3">
           <input
             type="password"
@@ -164,6 +180,31 @@ export default function Page() {
         <p className="mt-2 text-[1.25rem] text-faint">
           Klucz zostaje tylko w Twojej przeglądarce i leci wprost do Anthropic. Nie trafia do repo ani na serwer.
         </p>
+
+        {/* typ treści — dobiera normy platformy */}
+        <div className="mt-7">
+          <label className="eyebrow">Typ treści</label>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setCategory(null)}
+              className={`rounded-full border px-3.5 py-1.5 font-mono text-[1.15rem] transition-colors ${chipCls(category === null)}`}
+            >
+              Ogólne
+            </button>
+            {CONTENT_CATEGORIES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCategory(c.id)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-mono text-[1.15rem] transition-colors ${chipCls(category === c.id)}`}
+              >
+                <span aria-hidden>{c.emoji}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div className="mt-7 grid gap-6 md:grid-cols-2">
           <div>
@@ -216,6 +257,12 @@ export default function Page() {
         </div>
       </section>
 
+      {loading && !report && (
+        <div className="mt-10">
+          <ThinkingLoader />
+        </div>
+      )}
+
       {report && (
         <section className="mt-10 space-y-6">
           {/* ocena */}
@@ -245,16 +292,14 @@ export default function Page() {
                     .sort((a, b) => b.impact_score - a.impact_score)
                     .map((issue, i) => (
                     <li key={i} className="rounded-2xl border border-line bg-surface-2/50 p-4">
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          title={`Wpływ na post: ${issue.impact_score}/10`}
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${impactStyle(issue.impact_score)}`}
-                        >
-                          <span className="tabular-nums">{issue.impact_score}/10</span>
-                          <span className="opacity-70">· {impactLabel(issue.impact_score)}</span>
-                        </span>
-                        <span className="font-display text-[1.5rem] font-bold">{issue.title}</span>
-                      </div>
+                      <span
+                        title={`Wpływ na post: ${issue.impact_score}/10`}
+                        className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 font-mono text-[1rem] font-semibold uppercase tracking-wider ring-1 ${impactStyle(issue.impact_score)}`}
+                      >
+                        <span className="tabular-nums">{issue.impact_score}/10</span>
+                        <span className="opacity-70">· {impactLabel(issue.impact_score)}</span>
+                      </span>
+                      <h3 className="mt-2.5 font-display text-[1.6rem] font-bold leading-snug text-balance">{issue.title}</h3>
                       <p className="mt-2 text-[1.4rem] leading-relaxed text-muted">{issue.detail}</p>
                       <p className="mt-1.5 text-[1.4rem] leading-relaxed text-ink">
                         <span className="font-mono text-[1.05rem] font-semibold uppercase tracking-wider text-emerald-700">Poprawka</span>{' '}
@@ -275,7 +320,14 @@ export default function Page() {
                     <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-[1.2rem] font-bold ${item.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] text-brand-dark'}`}>
                       {item.passed ? '✓' : '✗'}
                     </span>
-                    <span className={item.passed ? 'text-muted' : 'text-ink'}>{item.label}</span>
+                    <span className={item.passed ? 'text-muted' : 'text-ink'}>
+                      {item.label}
+                      {item.platform_check && (
+                        <span className="ml-2 rounded-full bg-surface-2 px-2 py-0.5 align-middle font-mono text-[0.95rem] uppercase tracking-wider text-faint">
+                          platforma
+                        </span>
+                      )}
+                    </span>
                   </li>
                 ))}
               </ul>

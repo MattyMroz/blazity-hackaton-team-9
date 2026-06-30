@@ -57,6 +57,10 @@ const reportTool: Anthropic.Tool = {
           properties: {
             label: { type: 'string' },
             passed: { type: 'boolean' },
+            platform_check: {
+              type: 'boolean',
+              description: 'true if this is a platform-specific constraint check (character count, format rules, etc.), false or omitted for brand/quality checks',
+            },
           },
           required: ['label', 'passed'],
         },
@@ -71,9 +75,18 @@ export async function analyzeContent(opts: {
   guidelines: string
   draft: string
   model: ModelId
+  categoryContext?: string
 }): Promise<Report> {
   // The key never leaves the browser except in the request straight to Anthropic.
   const client = new Anthropic({ apiKey: opts.apiKey, dangerouslyAllowBrowser: true })
+
+  // Optional content-type context (LinkedIn/X/...) is prepended so the model
+  // judges against the right platform norms and adds platform_check items.
+  const userMessage = [
+    opts.categoryContext ? `${opts.categoryContext}\n\n` : '',
+    `BRAND GUIDELINES:\n${opts.guidelines}`,
+    `\n\nDRAFT CONTENT:\n${opts.draft}`,
+  ].join('')
 
   const res = await client.messages.create({
     model: opts.model,
@@ -81,12 +94,7 @@ export async function analyzeContent(opts: {
     system: SYSTEM,
     tools: [reportTool],
     tool_choice: { type: 'tool', name: 'report' },
-    messages: [
-      {
-        role: 'user',
-        content: `BRAND GUIDELINES:\n${opts.guidelines}\n\nDRAFT CONTENT:\n${opts.draft}`,
-      },
-    ],
+    messages: [{ role: 'user', content: userMessage }],
   })
 
   const block = res.content.find((b) => b.type === 'tool_use')

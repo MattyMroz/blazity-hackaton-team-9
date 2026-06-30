@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 // Repo name → GitHub Pages serves the site under https://<user>.github.io/<repo>/
-const repo = 'blazity-hackaton'
+const repo = 'blazity-hackaton-team-9'
 const isProd = process.env.NODE_ENV === 'production'
 
 const nextConfig = {
