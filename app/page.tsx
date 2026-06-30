@@ -1,0 +1,252 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { analyzeContent, MODEL } from '@/lib/analyzeContent'
+import type { Issue, Report } from '@/lib/schema'
+
+const KEY_STORAGE = 'brandlint.apiKey'
+
+const SAMPLE_GUIDELINES = `Brand: Northwind.
+Voice: confident, warm, plain-spoken. We sound like a knowledgeable friend, never a salesperson.
+Rules:
+- No ALL CAPS, no more than one exclamation mark per message.
+- No hype words ("amazing", "revolutionary", "game-changer").
+- Always lead with the customer benefit, not the feature.
+- British English spelling. Inclusive, jargon-free language.`
+
+const SAMPLE_DRAFT = `HEY!!! Our AMAZING new dashboard is a total game-changer!!!
+It has SO many features you won't believe it. Sign up now or miss out forever!!!`
+
+const severityStyle: Record<Issue['severity'], string> = {
+  high: 'bg-red-100 text-red-700 ring-red-200',
+  medium: 'bg-amber-100 text-amber-700 ring-amber-200',
+  low: 'bg-stone-100 text-stone-600 ring-stone-200',
+}
+
+function scoreColor(score: number): string {
+  if (score >= 80) return 'text-emerald-600'
+  if (score >= 60) return 'text-amber-600'
+  return 'text-red-600'
+}
+
+function humanError(e: unknown): string {
+  if (e && typeof e === 'object' && 'status' in e) {
+    const status = (e as { status?: number }).status
+    if (status === 401) return 'Nieprawidłowy klucz API (401). Sprawdź sk-ant-...'
+    if (status === 429) return 'Limit zapytań (429) — odczekaj chwilę i spróbuj ponownie.'
+    if (status === 400) return 'Błędne żądanie (400). Spróbuj skrócić treść.'
+  }
+  if (e instanceof Error) return e.message
+  return 'Coś poszło nie tak.'
+}
+
+export default function Page() {
+  const [apiKey, setApiKey] = useState('')
+  const [guidelines, setGuidelines] = useState('')
+  const [draft, setDraft] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [report, setReport] = useState<Report | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem(KEY_STORAGE)
+    if (saved) setApiKey(saved)
+  }, [])
+
+  function onKeyChange(value: string) {
+    setApiKey(value)
+    localStorage.setItem(KEY_STORAGE, value)
+  }
+
+  function loadSample() {
+    setGuidelines(SAMPLE_GUIDELINES)
+    setDraft(SAMPLE_DRAFT)
+  }
+
+  async function onAnalyze() {
+    setError(null)
+    setReport(null)
+    if (!apiKey.trim()) {
+      setError('Wklej swój klucz Anthropic (sk-ant-...) powyżej.')
+      return
+    }
+    if (!draft.trim()) {
+      setError('Wklej treść do sprawdzenia.')
+      return
+    }
+    setLoading(true)
+    try {
+      const result = await analyzeContent({
+        apiKey: apiKey.trim(),
+        guidelines:
+          guidelines.trim() ||
+          'No explicit brand guidelines provided — apply general best practices for clear, professional, on-brand content.',
+        draft: draft.trim(),
+      })
+      setReport(result)
+    } catch (e) {
+      setError(humanError(e))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function copyImproved() {
+    if (!report) return
+    await navigator.clipboard.writeText(report.improved_version)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
+  return (
+    <main className="mx-auto max-w-5xl px-5 py-10">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Brand<span className="text-brand">Lint</span>
+          </h1>
+          <p className="mt-1 text-stone-600">
+            Wklej wytyczne marki i treść — dostań natychmiastowy audyt zgodności.
+          </p>
+        </div>
+        <span className="rounded-full bg-stone-900 px-3 py-1 text-xs font-medium text-white">
+          {MODEL}
+        </span>
+      </header>
+
+      <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <label className="block text-sm font-medium text-stone-700">Klucz Anthropic API</label>
+        <input
+          type="password"
+          value={apiKey}
+          onChange={(e) => onKeyChange(e.target.value)}
+          placeholder="sk-ant-..."
+          autoComplete="off"
+          className="mt-1.5 w-full rounded-lg border border-stone-300 px-3 py-2 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        />
+        <p className="mt-1.5 text-xs text-stone-500">
+          Klucz zostaje tylko w Twojej przeglądarce (localStorage) i leci wprost do Anthropic. Nie trafia do repo ani na serwer.
+        </p>
+
+        <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <div>
+            <div className="mb-1.5 flex items-center justify-between">
+              <label className="text-sm font-medium text-stone-700">Brand guidelines</label>
+              <button
+                type="button"
+                onClick={loadSample}
+                className="text-xs font-medium text-brand hover:text-brand-dark"
+              >
+                Wstaw przykład
+              </button>
+            </div>
+            <textarea
+              value={guidelines}
+              onChange={(e) => setGuidelines(e.target.value)}
+              placeholder="Ton głosu, zasady, czego unikać..."
+              className="min-h-40 w-full resize-y rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700">Treść do sprawdzenia</label>
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Wklej post / e-mail / opis produktu..."
+              className="min-h-40 w-full resize-y rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            />
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onAnalyze}
+            disabled={loading}
+            className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? 'Analizuję…' : 'Analizuj'}
+          </button>
+          {error && <span className="text-sm font-medium text-red-600">{error}</span>}
+        </div>
+      </section>
+
+      {report && (
+        <section className="mt-8 space-y-6">
+          <div className="flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+            <div className="flex shrink-0 flex-col items-center">
+              <span className={`text-5xl font-bold tabular-nums ${scoreColor(report.score)}`}>
+                {report.score}
+              </span>
+              <span className="text-xs uppercase tracking-wide text-stone-500">/ 100</span>
+            </div>
+            <p className="text-stone-700">{report.summary}</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-lg font-semibold">
+                Problemy <span className="text-stone-400">({report.issues.length})</span>
+              </h2>
+              {report.issues.length === 0 ? (
+                <p className="text-sm text-emerald-600">Brak problemów — treść jest on-brand. 🎉</p>
+              ) : (
+                <ul className="space-y-3">
+                  {report.issues.map((issue, i) => (
+                    <li key={i} className="rounded-lg border border-stone-100 bg-stone-50 p-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ring-1 ${severityStyle[issue.severity]}`}
+                        >
+                          {issue.severity}
+                        </span>
+                        <span className="font-medium">{issue.title}</span>
+                      </div>
+                      <p className="mt-1.5 text-sm text-stone-600">{issue.detail}</p>
+                      <p className="mt-1 text-sm text-stone-800">
+                        <span className="font-medium text-emerald-700">Fix:</span> {issue.suggestion}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-3 text-lg font-semibold">Checklist przed publikacją</h2>
+              <ul className="space-y-2">
+                {report.publish_checklist.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className={item.passed ? 'text-emerald-600' : 'text-red-500'}>
+                      {item.passed ? '✓' : '✗'}
+                    </span>
+                    <span className={item.passed ? 'text-stone-600' : 'text-stone-800'}>{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Wersja on-brand</h2>
+              <button
+                type="button"
+                onClick={copyImproved}
+                className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-medium hover:bg-stone-50"
+              >
+                {copied ? 'Skopiowano ✓' : 'Kopiuj'}
+              </button>
+            </div>
+            <p className="whitespace-pre-wrap text-stone-800">{report.improved_version}</p>
+          </div>
+        </section>
+      )}
+
+      <footer className="mt-12 text-center text-xs text-stone-400">
+        BrandLint · Next.js + Tailwind + Anthropic SDK + Zod · static (GitHub Pages)
+      </footer>
+    </main>
+  )
+}

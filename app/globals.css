@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #e87058;
+  --color-brand-dark: #d35a42;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #faf7f2;
+  color: #1c1917;
+  -webkit-font-smoothing: antialiased;
+}
+
+textarea {
+  field-sizing: content;
+}
