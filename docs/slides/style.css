@@ -365,8 +365,8 @@ h1 em, h2 em { font-family: var(--serif); font-style: italic; font-weight: 500; 
 .meta { margin-top: var(--sp-1); font-family: var(--mono); font-size: var(--fs-1); letter-spacing: 0.04em; color: var(--text-faint); }
 .slide[data-slide-kind="okladka"] h1 {
   font-size: var(--fs-7);
-  max-width: none;
-  white-space: nowrap;
+  max-width: 20ch;
+  white-space: normal;
 }
 .slide[data-slide-kind="okladka"] .copy {
   width: 100%;
@@ -941,8 +941,10 @@ h1 em, h2 em { font-family: var(--serif); font-style: italic; font-weight: 500; 
 /* CTA */
 .cta-row { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
 .copy.center .cta-row { justify-content: center; }
-.cta-btn { font-family: var(--sans); font-weight: 800; font-size: var(--fs-2); padding: var(--sp-3) var(--sp-5); border-radius: 999px; background: var(--accent); color: #fff; border: none; box-shadow: 0 var(--sp-2) var(--sp-4) calc(-1 * var(--sp-2)) var(--accent); display: inline-flex; align-items: center; gap: var(--sp-1); }
+.cta-btn { font-family: var(--sans); font-weight: 800; font-size: var(--fs-2); padding: var(--sp-3) var(--sp-5); border-radius: 999px; background: var(--accent); color: #fff; border: none; box-shadow: 0 var(--sp-2) var(--sp-4) calc(-1 * var(--sp-2)) var(--accent); display: inline-flex; align-items: center; gap: var(--sp-1); text-decoration: none; cursor: pointer; transition: transform .15s ease; }
+.cta-btn:hover { transform: translateY(-2px); }
 .cta-ghost { background: transparent; color: inherit; border: 1.5px solid currentColor; box-shadow: none; }
+.meta a { color: var(--accent); text-decoration: none; border-bottom: 1px solid currentColor; }
 .slide[data-tone="dark"] .cta-btn:not(.cta-ghost) { background: var(--accent-on-dark); color: #fff; box-shadow: 0 var(--sp-2) var(--sp-4) calc(-1 * var(--sp-2)) var(--accent-on-dark); }
 
 /* === progress + nav === */

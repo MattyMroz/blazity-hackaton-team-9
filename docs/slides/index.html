@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BrandLint · prezentacja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- icon sprite - use via <svg class="i"><use href="#i-..."/></svg> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/><path d="M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-trend-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2 4.5 13.5H11l-1 8.5L19.5 10H13z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9.5 6C6.5 7.2 5 9.6 5 13v5h6v-6H8.2c.1-1.8.9-3 2.6-3.7zM20 6c-3 1.2-4.5 3.6-4.5 7v5h6v-6h-2.8c.1-1.8.9-3 2.6-3.7z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></symbol>
+</svg>
+
+<div id="deck">
+
+  <!-- 01 OKLADKA -->
+  <section class="slide layout-full" data-slide-kind="okladka">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="chrome-date">Blazity · 2026</span><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy">
+        <span class="eyebrow">Blazity · AI for Content · 30.06.2026</span>
+        <h1>Recenzent treści, który pilnuje twojej <em>marki</em><span class="dot">.</span></h1>
+        <p class="lead">Wklejasz draft i wytyczne, dostajesz raport z oceną i poprawkami</p>
+        <p class="meta">Demo na żywo: <a href="https://mattymroz.github.io/blazity-hackaton/" target="_blank" rel="noopener">mattymroz.github.io/blazity-hackaton</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 PROBLEM -->
+  <section class="slide layout-left" data-slide-kind="problem">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy">
+        <span class="eyebrow">Problem</span>
+        <h2>Ręczny przegląd treści jest wolny i&nbsp;<em>subiektywny</em><span class="dot">.</span></h2>
+        <p class="lead">Każdy post, mail i&nbsp;opis trzeba sprawdzić pod kątem głosu marki, ryzykownych obietnic i&nbsp;słabych CTA</p>
+      </div>
+      <div class="plate-wrap">
+        <div class="bigstat">
+          <span class="val">100<small>%</small></span>
+          <span class="cap">draftów dziś ocenia człowiek, ręcznie i&nbsp;na czucie</span>
+          <span class="cap muted">Każda osoba ocenia inaczej, brak jednego standardu</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 ROZWIAZANIE -->
+  <section class="slide layout-full pos-top" data-slide-kind="rozwiązanie">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy">
+        <span class="eyebrow">Rozwiązanie</span>
+        <h2>AI, które <em>recenzuje</em>, nie zmyśla<span class="dot">.</span></h2>
+      </div>
+      <div class="grid-3">
+        <div class="tile"><div class="ic"><svg class="i"><use href="#i-target"/></svg></div><strong>Ocena 0 do 100</strong><span>Jeden wynik zgodności z&nbsp;marką i&nbsp;krótki werdykt</span></div>
+        <div class="tile"><div class="ic"><svg class="i"><use href="#i-alert"/></svg></div><strong>Lista usterek</strong><span>Każda z&nbsp;cytatem z&nbsp;draftu i&nbsp;gotową poprawką</span></div>
+        <div class="tile"><div class="ic"><svg class="i"><use href="#i-check"/></svg></div><strong>Gotowy rewrite</strong><span>Draft przepisany na głos marki, do publikacji</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 DEMO -->
+  <section class="slide layout-right" data-slide-kind="demo">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy">
+        <span class="eyebrow">Demo na żywo</span>
+        <h2>Trzy pola, jeden <em>raport</em><span class="dot">.</span></h2>
+        <p class="lead">Klucz Anthropic, wytyczne marki, draft, reszta dzieje się w&nbsp;przeglądarce</p>
+        <div class="demo-points">
+          <span><b>01</b> wynik i werdykt</span>
+          <span><b>02</b> usterki z cytatem</span>
+          <span><b>03</b> checklista publikacji</span>
+        </div>
+      </div>
+      <div class="plate-wrap">
+        <div class="phone">
+          <div class="phone-shot">
+            <div class="ph-card">
+              <div class="ph-img"><img src="img/method-2.png" alt="Ekran raportu w aplikacji BrandLint" /></div>
+              <div class="ph-meta"><strong>Ocena 87 / 100</strong><span>3 usterki · rewrite gotowy</span></div>
+              <div class="ph-actions"><span class="x"><svg class="i"><use href="#i-alert"/></svg></span><span class="heart"><svg class="i"><use href="#i-check"/></svg></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ARCHITEKTURA -->
+  <section class="slide layout-full pos-top" data-slide-kind="technologie">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy">
+        <span class="eyebrow">Pod maską</span>
+        <h2>Statycznie, <em>bez backendu</em><span class="dot">.</span></h2>
+        <p class="lead">Next.js 15, React 19, Claude przez Anthropic&nbsp;SDK, walidacja Zod</p>
+      </div>
+      <div class="arch-map">
+        <div class="arch-node"><span>01</span><strong>Twój klucz</strong><small>w przeglądarce, nie na serwerze</small></div>
+        <div class="arch-arrow"><svg class="i"><use href="#i-arrow"/></svg></div>
+        <div class="arch-node"><span>02</span><strong>Claude</strong><small>tool use, opus 4.8</small></div>
+        <div class="arch-arrow"><svg class="i"><use href="#i-arrow"/></svg></div>
+        <div class="arch-node"><span>03</span><strong>Walidacja</strong><small>Zod sprawdza raport</small></div>
+        <div class="arch-arrow"><svg class="i"><use href="#i-arrow"/></svg></div>
+        <div class="arch-node"><span>04</span><strong>Raport</strong><small>ocena, usterki, rewrite</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 ZAKONCZENIE -->
+  <section class="slide layout-center" data-slide-kind="zakończenie" data-tone="dark">
+    <div class="slide-chrome">
+      <div class="left"><span class="mark">BL</span><span><b>BrandLint</b></span></div>
+      <div class="right"><span class="pageno">01 / 01</span></div>
+    </div>
+    <div class="slide-inner">
+      <div class="copy center">
+        <span class="eyebrow">Wypróbuj</span>
+        <h1>Sprawdź swój draft, zanim zrobi to <em>klient</em><span class="dot">?</span></h1>
+        <div class="cta-row">
+          <a class="cta-btn" href="https://mattymroz.github.io/blazity-hackaton/" target="_blank" rel="noopener"><svg class="i"><use href="#i-arrow"/></svg>Otwórz demo</a>
+          <a class="cta-btn cta-ghost" href="https://github.com/mattymroz/blazity-hackaton" target="_blank" rel="noopener">Kod na GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="nav" aria-label="nav"></div>
+<div class="deck-progress"><div class="bar"></div></div>
+<button id="theme-btn" aria-label="theme"><svg class="i"><use href="#i-sun"/></svg></button>
+
+<script src="app.js"></script>
+</body>
+</html>

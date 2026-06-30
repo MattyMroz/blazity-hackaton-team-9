@@ -82,5 +82,6 @@
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { go(idx + (dx < 0 ? 1 : -1)); }
   }, { passive: true });
 
-  applySlide(0);
+  var startParam = parseInt((location.search.match(/[?&]slide=(\d+)/) || [])[1], 10);
+  applySlide(isNaN(startParam) ? 0 : startParam - 1);
 })();
