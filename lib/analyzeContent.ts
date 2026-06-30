@@ -62,9 +62,16 @@ export async function analyzeContent(opts: {
   guidelines: string
   draft: string
   model: ModelId
+  categoryContext?: string
 }): Promise<Report> {
   // The key never leaves the browser except in the request straight to Anthropic.
   const client = new Anthropic({ apiKey: opts.apiKey, dangerouslyAllowBrowser: true })
+
+  const userMessage = [
+    opts.categoryContext ? `${opts.categoryContext}\n\n` : '',
+    `BRAND GUIDELINES:\n${opts.guidelines}`,
+    `\n\nDRAFT CONTENT:\n${opts.draft}`,
+  ].join('')
 
   const res = await client.messages.create({
     model: opts.model,
@@ -75,7 +82,7 @@ export async function analyzeContent(opts: {
     messages: [
       {
         role: 'user',
-        content: `BRAND GUIDELINES:\n${opts.guidelines}\n\nDRAFT CONTENT:\n${opts.draft}`,
+        content: userMessage,
       },
     ],
   })

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { analyzeContent, MODELS, DEFAULT_MODEL, type ModelId } from '@/lib/analyzeContent'
+import { CONTENT_CATEGORIES, type CategoryId } from '@/lib/categories'
 import type { Issue, Report } from '@/lib/schema'
 
 const KEY_STORAGE = 'brandlint.apiKey'
@@ -43,6 +44,7 @@ function humanError(e: unknown): string {
 export default function Page() {
   const [apiKey, setApiKey] = useState('')
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL)
+  const [category, setCategory] = useState<CategoryId | null>(null)
   const [guidelines, setGuidelines] = useState('')
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
@@ -84,6 +86,7 @@ export default function Page() {
     }
     setLoading(true)
     try {
+      const selectedCategory = CONTENT_CATEGORIES.find((c) => c.id === category)
       const result = await analyzeContent({
         apiKey: apiKey.trim(),
         model,
@@ -91,6 +94,7 @@ export default function Page() {
           guidelines.trim() ||
           'No explicit brand guidelines provided — apply general best practices for clear, professional, on-brand content.',
         draft: draft.trim(),
+        categoryContext: selectedCategory?.context,
       })
       setReport(result)
     } catch (e) {
@@ -149,6 +153,30 @@ export default function Page() {
         <p className="mt-1.5 text-xs text-stone-500">
           Klucz zostaje tylko w Twojej przeglądarce (localStorage) i leci wprost do Anthropic. Nie trafia do repo ani na serwer.
         </p>
+
+        <div className="mt-5">
+          <p className="mb-2 text-sm font-medium text-stone-700">Kategoria treści <span className="font-normal text-stone-400">(opcjonalna)</span></p>
+          <div className="flex flex-wrap gap-2">
+            {CONTENT_CATEGORIES.map((cat) => {
+              const active = category === cat.id
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategory(active ? null : cat.id)}
+                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    active
+                      ? 'border-stone-900 bg-stone-900 text-white'
+                      : 'border-stone-300 bg-white text-stone-700 hover:border-stone-400 hover:bg-stone-50'
+                  }`}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <div className="mt-5 grid gap-5 md:grid-cols-2">
           <div>
